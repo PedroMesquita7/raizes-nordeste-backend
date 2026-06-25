@@ -1,0 +1,153 @@
+{
+  "info": {
+    "name": "Raizes do Nordeste - Pedro 4710499",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "Colecao de testes da API - Pedro Marques Mesquita RU 4710499",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:8080"},
+    {"key": "token", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "T01 - Login Valido",
+          "event": [{"listen": "test", "script": {"exec": ["var json = pm.response.json();", "if (json.token) { pm.environment.set('token', json.token); }"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"email\": \"admin@raizes.com\", \"senha\": \"raizes4710499\"}"},
+            "url": {"raw": "{{base_url}}/autenticacao/login", "host": ["{{base_url}}"], "path": ["autenticacao", "login"]}
+          }
+        },
+        {
+          "name": "T02 - Registro de Usuario",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"nome\": \"Pedro Teste\", \"email\": \"pedro.novo@raizes.com\", \"senha\": \"senha123\", \"perfil\": \"CLIENTE\"}"},
+            "url": {"raw": "{{base_url}}/autenticacao/registro", "host": ["{{base_url}}"], "path": ["autenticacao", "registro"]}
+          }
+        },
+        {
+          "name": "T07 - Acesso sem Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/pedidos", "host": ["{{base_url}}"], "path": ["pedidos"]}
+          }
+        },
+        {
+          "name": "T08 - Login com Senha Errada",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\"email\": \"admin@raizes.com\", \"senha\": \"senhaerrada\"}"},
+            "url": {"raw": "{{base_url}}/autenticacao/login", "host": ["{{base_url}}"], "path": ["autenticacao", "login"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "T03 - Criar Pedido Valido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\"clienteId\": 1, \"unidadeId\": 1, \"canalPedido\": \"APP\", \"formaPagamento\": \"PIX\", \"itens\": [{\"produtoId\": 1, \"quantidade\": 2}]}"},
+            "url": {"raw": "{{base_url}}/pedidos", "host": ["{{base_url}}"], "path": ["pedidos"]}
+          }
+        },
+        {
+          "name": "T04 - Listar Pedidos",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/pedidos", "host": ["{{base_url}}"], "path": ["pedidos"]}
+          }
+        },
+        {
+          "name": "T05 - Buscar Pedido por ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/pedidos/1", "host": ["{{base_url}}"], "path": ["pedidos", "1"]}
+          }
+        },
+        {
+          "name": "T09 - Pedido com Produto Inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\"clienteId\": 1, \"unidadeId\": 1, \"canalPedido\": \"TOTEM\", \"formaPagamento\": \"CARTAO\", \"itens\": [{\"produtoId\": 9999, \"quantidade\": 1}]}"},
+            "url": {"raw": "{{base_url}}/pedidos", "host": ["{{base_url}}"], "path": ["pedidos"]}
+          }
+        },
+        {
+          "name": "T11 - Campo Obrigatorio Ausente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\"clienteId\": 1}"},
+            "url": {"raw": "{{base_url}}/pedidos", "host": ["{{base_url}}"], "path": ["pedidos"]}
+          }
+        },
+        {
+          "name": "T12 - Estoque Insuficiente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\"clienteId\": 1, \"unidadeId\": 1, \"canalPedido\": \"WEB\", \"formaPagamento\": \"PIX\", \"itens\": [{\"produtoId\": 1, \"quantidade\": 9999}]}"},
+            "url": {"raw": "{{base_url}}/pedidos", "host": ["{{base_url}}"], "path": ["pedidos"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pagamento",
+      "item": [
+        {
+          "name": "T06 - Pagamento Aprovado",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/pagamentos/processar/1", "host": ["{{base_url}}"], "path": ["pagamentos", "processar", "1"]}
+          }
+        },
+        {
+          "name": "T10 - Reprocessamento de Pagamento (Ja Pago)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/pagamentos/processar/1", "host": ["{{base_url}}"], "path": ["pagamentos", "processar", "1"]}
+          }
+        },
+        {
+          "name": "T13 - Pagamento Recusado (Valor Alto)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{base_url}}/pagamentos/processar/2", "host": ["{{base_url}}"], "path": ["pagamentos", "processar", "2"]}
+          }
+        }
+      ]
+    }
+  ]
+}
